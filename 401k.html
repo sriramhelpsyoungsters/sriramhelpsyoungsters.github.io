@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>401(k) Compound Growth Calculator · Future You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:      #050d1a;
+      --navy-mid:  #0c1a30;
+      --navy-card: #0f2040;
+      --navy-deep: #07111f;
+      --green:     #00e676;
+      --green-dim: #00b85c;
+      --green-glow: rgba(0,230,118,0.15);
+      --amber:     #ffab00;
+      --amber-glow: rgba(255,171,0,0.15);
+      --coral:     #ff6b6b;
+      --sky:       #40c4ff;
+      --white:     #f0f4ff;
+      --muted:     #7a8eaa;
+      --border:    rgba(0,230,118,0.14);
+      --border-dim: rgba(255,255,255,0.06);
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body:    'Nunito', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2.5rem;
+      background: rgba(5,13,26,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.08em; color: var(--green); text-decoration: none; }
+    .nav-brand span { color: var(--white); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--green); }
+    .nav-back { background: var(--navy-card); border: 1px solid var(--border); color: var(--green) !important; padding: 0.4rem 1rem; border-radius: 4px; }
+
+    /* ── PAGE HERO ── */
+    .page-hero {
+      padding: 6.5rem 2.5rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 2rem;
+      border-bottom: 1px solid var(--border-dim);
+      background: radial-gradient(ellipse 60% 80% at 80% 20%, rgba(0,230,118,0.05) 0%, transparent 60%);
+    }
+    .page-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--green); margin-bottom: 0.5rem;
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 0.95; letter-spacing: 0.02em;
+      animation: fadeDown 0.6s ease both;
+    }
+    .page-sub {
+      font-size: 0.95rem; color: var(--muted); max-width: 560px;
+      margin-top: 0.75rem; line-height: 1.7;
+      animation: fadeDown 0.6s 0.1s ease both;
+    }
+    .limits-badge {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem;
+      animation: fadeDown 0.6s 0.2s ease both;
+    }
+    .limit-pill {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--navy-card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.35rem 0.75rem;
+      font-size: 0.76rem; font-weight: 700; color: var(--muted);
+      font-family: var(--font-mono);
+    }
+    .limit-pill span { color: var(--green); }
+
+    /* ── MAIN LAYOUT ── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 0;
+      min-height: calc(100vh - 140px);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: var(--navy-deep);
+      border-right: 1px solid var(--border-dim);
+      padding: 2rem;
+      overflow-y: auto;
+      position: sticky;
+      top: 60px;
+      height: calc(100vh - 60px);
+    }
+
+    .sidebar-section { margin-bottom: 2rem; }
+
+    .sidebar-section-title {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--green);
+      margin-bottom: 1rem; padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+
+    .field { margin-bottom: 1.1rem; }
+
+    .field label {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.78rem; font-weight: 700; color: var(--muted);
+      letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem;
+    }
+
+    .field label .lval {
+      font-family: var(--font-mono); color: var(--white); font-weight: 500;
+      font-size: 0.82rem; letter-spacing: 0; text-transform: none;
+    }
+
+    .field input[type=number], .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.95rem; font-weight: 700;
+      outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .field input[type=number]:focus, .field select:focus {
+      border-color: var(--green); background: rgba(0,230,118,0.04);
+    }
+    .field select option { background: var(--navy-deep); }
+
+    .field input[type=range] {
+      width: 100%; height: 4px; appearance: none;
+      background: rgba(255,255,255,0.1); border-radius: 100px; outline: none; cursor: pointer;
+    }
+    .field input[type=range]::-webkit-slider-thumb {
+      appearance: none; width: 16px; height: 16px;
+      background: var(--green); border-radius: 50%;
+      box-shadow: 0 0 8px rgba(0,230,118,0.5); cursor: pointer;
+    }
+
+    .toggle-group {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;
+    }
+    .toggle-btn {
+      padding: 0.55rem 0; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);
+      background: transparent; color: var(--muted);
+      font-family: var(--font-body); font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; text-align: center; transition: all 0.2s; letter-spacing: 0.04em;
+    }
+    .toggle-btn.active {
+      background: var(--green-glow); border-color: var(--green); color: var(--green);
+    }
+
+    .info-tip {
+      font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem;
+      line-height: 1.5; padding: 0.5rem 0.75rem;
+      background: rgba(255,255,255,0.02); border-radius: 6px;
+      border-left: 2px solid var(--border);
+    }
+
+    .limit-warning {
+      font-size: 0.72rem; color: var(--amber);
+      background: var(--amber-glow); border: 1px solid rgba(255,171,0,0.2);
+      border-radius: 6px; padding: 0.4rem 0.7rem;
+      margin-top: 0.35rem; display: none;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      padding: 2rem 2.5rem;
+      overflow-y: auto;
+    }
+
+    /* ── SUMMARY CARDS ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .sum-card {
+      background: var(--navy-card);
+      border: 1px solid var(--border-dim);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sum-card.primary {
+      border-color: var(--border);
+      background: linear-gradient(135deg, var(--navy-card) 60%, rgba(0,230,118,0.05));
+    }
+
+    .sum-card::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      border-radius: 12px 12px 0 0;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .sum-card.primary::after { background: var(--green); opacity: 1; }
+
+    .sum-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;
+    }
+    .sum-value {
+      font-family: var(--font-display);
+      font-size: 1.9rem; letter-spacing: 0.02em; line-height: 1; margin-bottom: 0.2rem;
+    }
+    .sum-sub { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+
+    .v-green { color: var(--green); }
+    .v-amber { color: var(--amber); }
+    .v-sky   { color: var(--sky); }
+    .v-coral { color: var(--coral); }
+
+    /* ── TAB BAR ── */
+    .tab-bar {
+      display: flex; gap: 0.25rem;
+      border-bottom: 1px solid var(--border-dim);
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      padding: 0.65rem 1.25rem; border: none; background: transparent;
+      font-family: var(--font-body); font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+      cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: all 0.2s;
+    }
+    .tab.active { color: var(--green); border-bottom-color: var(--green); }
+    .tab:hover:not(.active) { color: var(--white); }
+
+    /* ── CHART AREA ── */
+    .chart-panel { display: none; }
+    .chart-panel.active { display: block; }
+
+    .chart-wrap {
+      background: var(--navy-card);
+      border: 1px solid var(--border-dim);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem; letter-spacing: 0.03em;
+      margin-bottom: 1.25rem; color: var(--white);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .chart-legend {
+      display: flex; gap: 1.25rem; font-size: 0.72rem; font-weight: 700; flex-wrap: wrap;
+    }
+    .legend-dot {
+      display: inline-block; width: 10px; height: 10px;
+      border-radius: 2px; margin-right: 0.3rem;
+    }
+
+    canvas { width: 100% !important; border-radius: 8px; }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: var(--navy-card);
+      border: 1px solid var(--border-dim);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .table-header-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem; letter-spacing: 0.03em;
+    }
+
+    .table-filter {
+      display: flex; gap: 0.4rem;
+    }
+
+    .tfilter-btn {
+      padding: 0.3rem 0.75rem; border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: transparent; color: var(--muted);
+      font-family: var(--font-body); font-size: 0.72rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .tfilter-btn.active { background: var(--green-glow); border-color: var(--green); color: var(--green); }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      background: rgba(255,255,255,0.02);
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--muted);
+      padding: 0.75rem 1.5rem; text-align: right; border-bottom: 1px solid var(--border-dim);
+    }
+    .data-table th:first-child { text-align: left; }
+    .data-table td {
+      padding: 0.65rem 1.5rem; font-size: 0.82rem;
+      font-family: var(--font-mono); text-align: right;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .data-table td:first-child { text-align: left; font-family: var(--font-body); font-weight: 700; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .data-table .milestone-row td { color: var(--green); }
+    .data-table .milestone-row td:first-child::before { content: '★ '; color: var(--green); }
+
+    /* ── COMPARISON TAB ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .compare-card {
+      background: var(--navy-card);
+      border: 1px solid var(--border-dim);
+      border-radius: 14px;
+      padding: 1.5rem;
+    }
+
+    .compare-card.traditional { border-top: 3px solid var(--amber); }
+    .compare-card.roth        { border-top: 3px solid var(--green); }
+
+    .compare-card-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem; letter-spacing: 0.03em; margin-bottom: 0.25rem;
+    }
+
+    .compare-card-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5; }
+
+    .compare-rows { display: flex; flex-direction: column; gap: 0.6rem; }
+    .compare-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255,255,255,0.02); border-radius: 6px;
+      font-size: 0.82rem;
+    }
+    .compare-row-label { color: var(--muted); }
+    .compare-row-value { font-family: var(--font-mono); font-weight: 500; }
+
+    .verdict-banner {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      display: flex; align-items: flex-start; gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .verdict-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .verdict-title { font-weight: 700; margin-bottom: 0.25rem; font-size: 0.95rem; }
+    .verdict-text { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── COST OF WAITING TAB ── */
+    .wait-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .wait-card {
+      background: var(--navy-card);
+      border: 1px solid var(--border-dim);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .wait-card.current-age { border-color: var(--green); }
+    .wait-card-age { font-family: var(--font-display); font-size: 2.8rem; color: var(--green); line-height: 1; }
+    .wait-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0.3rem 0 0.75rem; }
+    .wait-card-amount { font-family: var(--font-mono); font-size: 1rem; font-weight: 500; margin-bottom: 0.2rem; }
+    .wait-card-cost { font-size: 0.75rem; color: var(--coral); }
+
+    /* ── MILESTONE TRACKER ── */
+    .milestones {
+      display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;
+    }
+    .milestone {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.85rem 1.25rem;
+      background: var(--navy-card);
+      border: 1px solid var(--border-dim);
+      border-radius: 10px;
+    }
+    .milestone.reached { border-color: var(--border); }
+    .ms-icon { font-size: 1.2rem; }
+    .ms-info { flex: 1; }
+    .ms-title { font-size: 0.88rem; font-weight: 700; }
+    .ms-detail { font-size: 0.78rem; color: var(--muted); }
+    .ms-status {
+      font-family: var(--font-mono); font-size: 0.82rem; font-weight: 500;
+      text-align: right;
+    }
+    .ms-eta { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+    .ms-bar-track {
+      height: 4px; background: rgba(255,255,255,0.06);
+      border-radius: 100px; overflow: hidden; margin-top: 0.4rem;
+    }
+    .ms-bar-fill {
+      height: 100%; border-radius: 100px;
+      background: linear-gradient(90deg, var(--green-dim), var(--green));
+      transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      padding: 1.5rem 2.5rem;
+      border-top: 1px solid var(--border-dim);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.75rem; color: var(--muted);
+      background: var(--navy-deep);
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .page-footer a { color: var(--green); text-decoration: none; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes countUp {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .wait-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 1rem; }
+      .page-hero { grid-template-columns: 1fr; padding: 5.5rem 1.25rem 1.5rem; }
+      .limits-badge { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+      .right-panel { padding: 1.25rem; }
+      .sidebar { padding: 1.25rem; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .wait-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-brand">FUTURE<span>YOU</span></a>
+  <ul class="nav-links">
+    <li><a href="401k.html" class="active">401(k)</a></li>
+    <li><a href="portfolio.html">Portfolio</a></li>
+    <li><a href="projection.html">Projector</a></li>
+    <li><a href="index.html" class="nav-back">← Home</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div>
+    <p class="page-label">Tool 01 · Compound Growth Engine</p>
+    <h1 class="page-title">401(k) CALCULATOR</h1>
+    <p class="page-sub">Model your full 401(k) trajectory with employer match, step-ups, Roth vs Traditional comparison, and the real cost of waiting.</p>
+  </div>
+  <div class="limits-badge">
+    <div class="limit-pill">2025 401(k) limit: <span>$23,500</span></div>
+    <div class="limit-pill">IRA limit: <span>$7,000</span></div>
+    <div class="limit-pill">Catch-up 50+: <span>+$7,500</span></div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- SIDEBAR: INPUTS -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">👤 About You</div>
+
+      <div class="field">
+        <label>Current Age <span class="lval" id="lv-age">27</span></label>
+        <input type="range" id="s-age" min="18" max="64" value="27" />
+      </div>
+
+      <div class="field">
+        <label>Retirement Age <span class="lval" id="lv-ret">65</span></label>
+        <input type="range" id="s-ret" min="55" max="75" value="65" />
+      </div>
+
+      <div class="field">
+        <label>Annual Salary ($) <span class="lval" id="lv-sal">$80,000</span></label>
+        <input type="number" id="s-sal" value="80000" min="20000" max="500000" step="1000" />
+      </div>
+
+      <div class="field">
+        <label>Annual Salary Growth (%) <span class="lval" id="lv-sg">3%</span></label>
+        <input type="range" id="s-sg" min="0" max="8" value="3" step="0.5" />
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">💰 Your Contributions</div>
+
+      <div class="field">
+        <label>Your Contribution Rate (%) <span class="lval" id="lv-cr">8%</span></label>
+        <input type="range" id="s-cr" min="1" max="30" value="8" step="0.5" />
+        <div class="limit-warning" id="warn-cr">⚠ Exceeds 2025 IRS limit of $23,500</div>
+      </div>
+
+      <div class="field">
+        <label>Annual Step-Up (%) <span class="lval" id="lv-su">1%</span></label>
+        <input type="range" id="s-su" min="0" max="3" value="1" step="0.25" />
+        <div class="info-tip">Increase your contribution rate by this % each year (great habit when you get a raise)</div>
+      </div>
+
+      <div class="field">
+        <label>Current Balance ($) <span class="lval" id="lv-bal">$12,000</span></label>
+        <input type="number" id="s-bal" value="12000" min="0" max="1000000" step="500" />
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">🏢 Employer Match</div>
+
+      <div class="field">
+        <label>Match Rate (%) <span class="lval" id="lv-mr">100%</span></label>
+        <input type="range" id="s-mr" min="0" max="100" value="100" step="25" />
+        <div class="info-tip">100% = dollar-for-dollar match. 50% = $0.50 per $1.</div>
+      </div>
+
+      <div class="field">
+        <label>Match Cap (% of salary) <span class="lval" id="lv-mc">4%</span></label>
+        <input type="range" id="s-mc" min="0" max="10" value="4" step="0.5" />
+        <div class="info-tip">Employer matches your contribution up to this % of salary. Always contribute at least this much!</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">📈 Investment Assumptions</div>
+
+      <div class="field">
+        <label>Expected Annual Return (%) <span class="lval" id="lv-ar">7%</span></label>
+        <input type="range" id="s-ar" min="3" max="12" value="7" step="0.25" />
+      </div>
+
+      <div class="field">
+        <label>Inflation Rate (%) <span class="lval" id="lv-inf">2.5%</span></label>
+        <input type="range" id="s-inf" min="1" max="5" value="2.5" step="0.25" />
+      </div>
+
+      <div class="field">
+        <label>Account Type</label>
+        <div class="toggle-group" id="acct-type">
+          <button class="toggle-btn active" data-val="traditional">Traditional</button>
+          <button class="toggle-btn" data-val="roth">Roth</button>
+        </div>
+        <div class="info-tip" id="acct-tip">Pre-tax contributions reduce taxable income now. Taxed at withdrawal.</div>
+      </div>
+
+      <div class="field">
+        <label>Marginal Tax Rate (%) <span class="lval" id="lv-tax">22%</span></label>
+        <input type="range" id="s-tax" min="10" max="37" value="22" step="1" />
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- RIGHT PANEL: RESULTS -->
+  <div class="right-panel">
+
+    <!-- SUMMARY CARDS -->
+    <div class="summary-grid">
+      <div class="sum-card primary">
+        <div class="sum-label">Projected Balance</div>
+        <div class="sum-value v-green" id="r-total">$0</div>
+        <div class="sum-sub" id="r-total-sub">at retirement</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Your Contributions</div>
+        <div class="sum-value v-amber" id="r-contrib">$0</div>
+        <div class="sum-sub">total you put in</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Employer Match</div>
+        <div class="sum-value v-sky" id="r-match">$0</div>
+        <div class="sum-sub">free money captured</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Investment Growth</div>
+        <div class="sum-value v-green" id="r-growth">$0</div>
+        <div class="sum-sub">compounding at work</div>
+      </div>
+    </div>
+
+    <!-- ADDITIONAL STAT ROW -->
+    <div class="summary-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:1.5rem;">
+      <div class="sum-card">
+        <div class="sum-label">Real Value (Inflation-Adj)</div>
+        <div class="sum-value" id="r-real" style="font-size:1.5rem; color:var(--white)">$0</div>
+        <div class="sum-sub">in today's dollars</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Est. Annual Income</div>
+        <div class="sum-value" id="r-income" style="font-size:1.5rem; color:var(--amber)">$0</div>
+        <div class="sum-sub">4% safe withdrawal/yr</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Growth Multiplier</div>
+        <div class="sum-value" id="r-mult" style="font-size:1.5rem; color:var(--sky)">0×</div>
+        <div class="sum-sub">every $1 became this</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab active" data-tab="chart">Growth Chart</button>
+      <button class="tab" data-tab="table">Year-by-Year</button>
+      <button class="tab" data-tab="compare">Roth vs Traditional</button>
+      <button class="tab" data-tab="wait">Cost of Waiting</button>
+      <button class="tab" data-tab="milestones">Milestones</button>
+    </div>
+
+    <!-- TAB: GROWTH CHART -->
+    <div class="chart-panel active" id="tab-chart">
+      <div class="chart-wrap">
+        <div class="chart-title">
+          Balance Over Time
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:var(--green)"></span>Total Balance</span>
+            <span><span class="legend-dot" style="background:var(--amber)"></span>Your Contributions</span>
+            <span><span class="legend-dot" style="background:var(--sky)"></span>Employer Match</span>
+          </div>
+        </div>
+        <canvas id="growthChart" height="300"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">
+          Annual Contribution Breakdown
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:var(--amber)"></span>You</span>
+            <span><span class="legend-dot" style="background:var(--sky)"></span>Match</span>
+            <span><span class="legend-dot" style="background:var(--green)"></span>Growth Added</span>
+          </div>
+        </div>
+        <canvas id="contribChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- TAB: YEAR BY YEAR TABLE -->
+    <div class="chart-panel" id="tab-table">
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-header-title">Year-by-Year Breakdown</div>
+          <div class="table-filter">
+            <button class="tfilter-btn active" data-freq="1">Every Year</button>
+            <button class="tfilter-btn" data-freq="5">Every 5 Yrs</button>
+            <button class="tfilter-btn" data-freq="10">Every 10 Yrs</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto; max-height:520px; overflow-y:auto;">
+          <table class="data-table" id="breakdown-table">
+            <thead>
+              <tr>
+                <th>Age</th>
+                <th>Your Contrib</th>
+                <th>Employer Match</th>
+                <th>Growth</th>
+                <th>Year-End Balance</th>
+                <th>Inflation-Adj</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ROTH VS TRADITIONAL -->
+    <div class="chart-panel" id="tab-compare">
+      <div id="verdict-banner" class="verdict-banner">
+        <div class="verdict-icon">💡</div>
+        <div>
+          <div class="verdict-title" id="verdict-title">Calculating...</div>
+          <div class="verdict-text" id="verdict-text"></div>
+        </div>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-card traditional">
+          <div class="compare-card-title v-amber">TRADITIONAL</div>
+          <div class="compare-card-sub">Pre-tax today. Taxed at withdrawal in retirement.</div>
+          <div class="compare-rows">
+            <div class="compare-row"><span class="compare-row-label">Gross at Retirement</span><span class="compare-row-value v-amber" id="c-trad-gross">—</span></div>
+            <div class="compare-row"><span class="compare-row-label">Tax at Withdrawal (<span id="c-trad-taxrate">22</span>%)</span><span class="compare-row-value v-coral" id="c-trad-tax">—</span></div>
+            <div class="compare-row"><span class="compare-row-label">After-Tax Value</span><span class="compare-row-value v-amber" id="c-trad-net">—</span></div>
+            <div class="compare-row"><span class="compare-row-label">Annual Tax Savings Now</span><span class="compare-row-value v-green" id="c-trad-save">—</span></div>
+            <div class="compare-row"><span class="compare-row-label">Best For</span><span class="compare-row-value" style="font-family:var(--font-body);font-size:0.75rem;color:var(--muted)">Higher tax rate now than in retirement</span></div>
+          </div>
+        </div>
+        <div class="compare-card roth">
+          <div class="compare-card-title v-green">ROTH</div>
+          <div class="compare-card-sub">After-tax today. 100% tax-free at withdrawal.</div>
+          <div class="compare-rows">
+            <div class="compare-row"><span class="compare-row-label">Gross at Retirement</span><span class="compare-row-value v-green" id="c-roth-gross">—</span></div>
+            <div class="compare-row"><span class="compare-row-label">Tax at Withdrawal</span><span class="compare-row-value v-green" id="c-roth-tax">$0</span></div>
+            <div class="compare-row"><span class="compare-row-label">After-Tax Value</span><span class="compare-row-value v-green" id="c-roth-net">—</span></div>
+            <div class="compare-row"><span class="compare-row-label">Extra Cost Now (after-tax)</span><span class="compare-row-value v-coral" id="c-roth-cost">—</span></div>
+            <div class="compare-row"><span class="compare-row-label">Best For</span><span class="compare-row-value" style="font-family:var(--font-body);font-size:0.75rem;color:var(--muted)">Lower tax rate now · expect higher rate later</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">After-Tax Value Comparison</div>
+        <canvas id="compareChart" height="240"></canvas>
+      </div>
+    </div>
+
+    <!-- TAB: COST OF WAITING -->
+    <div class="chart-panel" id="tab-wait">
+      <div class="wait-grid" id="wait-cards"></div>
+      <div class="chart-wrap">
+        <div class="chart-title">
+          What Waiting Costs You
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:var(--green)"></span>Start Now</span>
+            <span><span class="legend-dot" style="background:var(--amber)"></span>Wait 5 yrs</span>
+            <span><span class="legend-dot" style="background:var(--coral)"></span>Wait 10 yrs</span>
+          </div>
+        </div>
+        <canvas id="waitChart" height="260"></canvas>
+      </div>
+    </div>
+
+    <!-- TAB: MILESTONES -->
+    <div class="chart-panel" id="tab-milestones">
+      <div class="milestones" id="milestone-list"></div>
+    </div>
+
+  </div><!-- /right-panel -->
+</div><!-- /main-layout -->
+
+<div class="page-footer">
+  <span>📚 Calculations use standard FV formula with annual compounding. IRS 2025 limits applied automatically.</span>
+  <span>For education only · Not financial advice · <a href="index.html">← Future You Home</a></span>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<script>
+// ── Helpers ──────────────────────────────────────────────
+const fmt  = v => '$' + Math.round(v).toLocaleString();
+const fmtK = v => v >= 1e6 ? '$' + (v/1e6).toFixed(2)+'M' : '$' + Math.round(v/1000)+'K';
+const pct  = v => v.toFixed(1) + '%';
+
+// ── State ─────────────────────────────────────────────────
+const S = {
+  age: 27, ret: 65, sal: 80000, sg: 3, cr: 8, su: 1, bal: 12000,
+  mr: 100, mc: 4, ar: 7, inf: 2.5, acct: 'traditional', tax: 22
+};
+
+// ── Wire inputs ───────────────────────────────────────────
+function bindRange(id, key, labelId, suffix='', scale=1) {
+  const el = document.getElementById(id);
+  const lv = document.getElementById(labelId);
+  el.addEventListener('input', () => {
+    S[key] = parseFloat(el.value);
+    lv.textContent = suffix === '$' ? '$' + parseInt(S[key]*scale).toLocaleString()
+                   : S[key]*scale + suffix;
+    compute();
+  });
+  lv.textContent = suffix === '$' ? '$' + parseInt(S[key]*scale).toLocaleString()
+                 : S[key]*scale + suffix;
+}
+bindRange('s-age','age','lv-age','');
+bindRange('s-ret','ret','lv-ret','');
+bindRange('s-sg','sg','lv-sg','%');
+bindRange('s-cr','cr','lv-cr','%');
+bindRange('s-su','su','lv-su','%');
+bindRange('s-mr','mr','lv-mr','%');
+bindRange('s-mc','mc','lv-mc','%');
+bindRange('s-ar','ar','lv-ar','%');
+bindRange('s-inf','inf','lv-inf','%');
+bindRange('s-tax','tax','lv-tax','%');
+
+['s-sal','s-bal'].forEach(id => {
+  const key = id === 's-sal' ? 'sal' : 'bal';
+  const lbl = id === 's-sal' ? 'lv-sal' : 'lv-bal';
+  document.getElementById(id).addEventListener('input', e => {
+    S[key] = parseFloat(e.target.value) || 0;
+    document.getElementById(lbl).textContent = '$' + S[key].toLocaleString();
+    compute();
+  });
+  document.getElementById(lbl).textContent = '$' + S[key].toLocaleString();
+});
+
+// ── Account type toggle ───────────────────────────────────
+document.getElementById('acct-type').addEventListener('click', e => {
+  if (!e.target.dataset.val) return;
+  document.querySelectorAll('#acct-type .toggle-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  S.acct = e.target.dataset.val;
+  document.getElementById('acct-tip').textContent = S.acct === 'traditional'
+    ? 'Pre-tax contributions reduce taxable income now. Taxed at withdrawal.'
+    : 'After-tax contributions. Grows and withdraws 100% tax-free.';
+  compute();
+});
+
+// ── Tab switching ─────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.chart-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'chart') { resizeCharts(); }
+  });
+});
+
+// Table filter
+let tableFreq = 1;
+document.querySelectorAll('.tfilter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tfilter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tableFreq = parseInt(btn.dataset.freq);
+    renderTable(lastData);
+  });
+});
+
+// ── Chart instances ───────────────────────────────────────
+const chartDefaults = {
+  font: { family: "'DM Mono', monospace" },
+  color: 'rgba(122,142,170,1)'
+};
+Chart.defaults.font.family = chartDefaults.font.family;
+Chart.defaults.color = chartDefaults.color;
+
+function makeChart(id, cfg) {
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx, cfg);
+}
+
+const gridColor = 'rgba(255,255,255,0.05)';
+const axisColor = 'rgba(122,142,170,0.6)';
+
+const growthChart = makeChart('growthChart', {
+  type: 'line',
+  data: { labels: [], datasets: [
+    { label: 'Total Balance', data: [], fill: true,
+      borderColor: '#00e676', backgroundColor: 'rgba(0,230,118,0.07)',
+      borderWidth: 2, pointRadius: 0, tension: 0.4 },
+    { label: 'Your Contributions', data: [], fill: true,
+      borderColor: '#ffab00', backgroundColor: 'rgba(255,171,0,0.08)',
+      borderWidth: 1.5, pointRadius: 0, tension: 0.4 },
+    { label: 'Employer Match', data: [], fill: true,
+      borderColor: '#40c4ff', backgroundColor: 'rgba(64,196,255,0.06)',
+      borderWidth: 1.5, pointRadius: 0, tension: 0.4 }
+  ]},
+  options: {
+    responsive: true, animation: { duration: 400 },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0f2040', borderColor: 'rgba(0,230,118,0.3)', borderWidth: 1,
+        callbacks: { label: c => ' ' + c.dataset.label + ': ' + fmt(c.parsed.y) }
+      }
+    },
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: axisColor, maxTicksLimit: 10 } },
+      y: { grid: { color: gridColor }, ticks: { color: axisColor, callback: v => fmtK(v) } }
+    }
+  }
+});
+
+const contribChart = makeChart('contribChart', {
+  type: 'bar',
+  data: { labels: [], datasets: [
+    { label: 'You', data: [], backgroundColor: 'rgba(255,171,0,0.7)', borderRadius: 4 },
+    { label: 'Match', data: [], backgroundColor: 'rgba(64,196,255,0.6)', borderRadius: 4 },
+    { label: 'Growth Added', data: [], backgroundColor: 'rgba(0,230,118,0.5)', borderRadius: 4 }
+  ]},
+  options: {
+    responsive: true, animation: { duration: 400 },
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#0f2040', borderColor: 'rgba(0,230,118,0.3)', borderWidth: 1,
+      callbacks: { label: c => ' ' + c.dataset.label + ': ' + fmt(c.parsed.y) }
+    }},
+    scales: {
+      x: { stacked: true, grid: { color: gridColor }, ticks: { color: axisColor, maxTicksLimit: 10 } },
+      y: { stacked: true, grid: { color: gridColor }, ticks: { color: axisColor, callback: v => fmtK(v) } }
+    }
+  }
+});
+
+const compareChart = makeChart('compareChart', {
+  type: 'bar',
+  data: { labels: ['After-Tax Value at Retirement'], datasets: [
+    { label: 'Traditional (after-tax)', data: [0], backgroundColor: 'rgba(255,171,0,0.7)', borderRadius: 6 },
+    { label: 'Roth (tax-free)', data: [0], backgroundColor: 'rgba(0,230,118,0.7)', borderRadius: 6 }
+  ]},
+  options: {
+    responsive: true, indexAxis: 'y', animation: { duration: 400 },
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#0f2040', borderColor: 'rgba(0,230,118,0.3)', borderWidth: 1,
+      callbacks: { label: c => ' ' + c.dataset.label + ': ' + fmt(c.parsed.x) }
+    }},
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: axisColor, callback: v => fmtK(v) } },
+      y: { grid: { color: gridColor }, ticks: { color: axisColor } }
+    }
+  }
+});
+
+const waitChart = makeChart('waitChart', {
+  type: 'line',
+  data: { labels: [], datasets: [
+    { label: 'Start Now', data: [], borderColor: '#00e676', backgroundColor: 'rgba(0,230,118,0.05)',
+      fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 },
+    { label: 'Wait 5 yrs', data: [], borderColor: '#ffab00', backgroundColor: 'rgba(255,171,0,0.04)',
+      fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 },
+    { label: 'Wait 10 yrs', data: [], borderColor: '#ff6b6b', backgroundColor: 'rgba(255,107,107,0.04)',
+      fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 }
+  ]},
+  options: {
+    responsive: true, animation: { duration: 400 },
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#0f2040', borderColor: 'rgba(0,230,118,0.3)', borderWidth: 1,
+      callbacks: { label: c => ' ' + c.dataset.label + ': ' + fmt(c.parsed.y) }
+    }},
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: axisColor } },
+      y: { grid: { color: gridColor }, ticks: { color: axisColor, callback: v => fmtK(v) } }
+    }
+  }
+});
+
+// ── Core computation ──────────────────────────────────────
+const IRS_LIMIT = 23500;
+
+function projectBalance(startAge, retAge, startBal, startSal, salGrowth, contribRate, stepUp, matchRate, matchCap, annualReturn) {
+  const rows = [];
+  let bal = startBal, sal = startSal, cr = contribRate, totalYouContrib = 0, totalMatch = 0;
+  const r = annualReturn / 100;
+
+  for (let age = startAge; age < retAge; age++) {
+    const yourContrib = Math.min(sal * cr / 100, IRS_LIMIT + (age >= 50 ? 7500 : 0));
+    const employerMatch = sal * Math.min(cr / 100, matchCap / 100) * (matchRate / 100);
+    const totalNew = yourContrib + employerMatch;
+    const growthOnPrev = bal * r;
+    const growthOnNew  = totalNew * (r / 2); // mid-year approximation
+    const yearGrowth   = growthOnPrev + growthOnNew;
+
+    bal += totalNew + yearGrowth;
+    totalYouContrib += yourContrib;
+    totalMatch      += employerMatch;
+
+    rows.push({ age, sal, yourContrib, employerMatch, yearGrowth, bal, totalYouContrib, totalMatch });
+
+    sal *= (1 + salGrowth / 100);
+    cr   = Math.min(cr + stepUp, 30);
+  }
+  return rows;
+}
+
+let lastData = [];
+
+function compute() {
+  // IRS cap warning
+  const estAnnual = S.sal * S.cr / 100;
+  document.getElementById('warn-cr').style.display = estAnnual > IRS_LIMIT ? 'block' : 'none';
+
+  const rows = projectBalance(S.age, S.ret, S.bal, S.sal, S.sg, S.cr, S.su, S.mr, S.mc, S.ar);
+  lastData = rows;
+  if (!rows.length) return;
+
+  const final = rows[rows.length - 1];
+  const totalContrib = final.totalYouContrib;
+  const totalMatch   = final.totalMatch;
+  const totalGrowth  = final.bal - totalContrib - totalMatch - S.bal;
+  const years        = S.ret - S.age;
+  const inflFactor   = Math.pow(1 + S.inf / 100, years);
+  const realValue    = final.bal / inflFactor;
+  const income4pct   = final.bal * 0.04;
+  const mult         = totalContrib + S.bal > 0 ? (final.bal / (totalContrib + S.bal)).toFixed(1) : 0;
+
+  // Update summary cards
+  animNum('r-total',  final.bal);
+  animNum('r-contrib', totalContrib);
+  animNum('r-match',   totalMatch);
+  animNum('r-growth',  totalGrowth);
+  animNum('r-real',    realValue);
+  animNum('r-income',  income4pct);
+  document.getElementById('r-mult').textContent = mult + '×';
+  document.getElementById('r-total-sub').textContent = 'at age ' + S.ret;
+
+  // Charts
+  const labels = rows.map(r => r.age);
+  const contribCum = rows.map(r => r.totalYouContrib + S.bal);
+  const matchCum   = rows.map(r => r.totalYouContrib + r.totalMatch + S.bal);
+  const totalBals  = rows.map(r => r.bal);
+
+  growthChart.data.labels = labels;
+  growthChart.data.datasets[0].data = totalBals;
+  growthChart.data.datasets[1].data = contribCum;
+  growthChart.data.datasets[2].data = matchCum;
+  growthChart.update();
+
+  contribChart.data.labels = labels;
+  contribChart.data.datasets[0].data = rows.map(r => r.yourContrib);
+  contribChart.data.datasets[1].data = rows.map(r => r.employerMatch);
+  contribChart.data.datasets[2].data = rows.map(r => r.yearGrowth);
+  contribChart.update();
+
+  // Table
+  renderTable(rows);
+
+  // Roth vs Traditional comparison
+  const taxNow = S.tax / 100;
+  const taxRet = Math.max(0.1, taxNow - 0.05); // assume slightly lower in retirement
+  const tradNet = final.bal * (1 - taxRet);
+  const rothBal = final.bal; // identical gross (pretax vs roth have same FV if same $ contributed, but roth is post-tax so slightly less)
+  // For simplicity: trad = gross, roth = gross (employer match still taxed for roth at withdrawal)
+  const annualSavingsNow = totalContrib * taxNow;
+  const rothExtraCost = totalContrib * taxNow; // after-tax cost
+  document.getElementById('c-trad-gross').textContent = fmt(final.bal);
+  document.getElementById('c-trad-tax').textContent   = '-' + fmt(final.bal * taxRet);
+  document.getElementById('c-trad-net').textContent   = fmt(tradNet);
+  document.getElementById('c-trad-save').textContent  = fmt(totalContrib * taxNow / years) + '/yr avg';
+  document.getElementById('c-trad-taxrate').textContent = Math.round(taxRet * 100);
+  document.getElementById('c-roth-gross').textContent = fmt(final.bal);
+  document.getElementById('c-roth-net').textContent   = fmt(final.bal);
+  document.getElementById('c-roth-cost').textContent  = fmt(totalContrib * taxNow / years) + '/yr avg';
+
+  compareChart.data.datasets[0].data = [tradNet];
+  compareChart.data.datasets[1].data = [final.bal];
+  compareChart.update();
+
+  const rothWins = final.bal > tradNet;
+  document.getElementById('verdict-title').textContent = rothWins
+    ? '🌱 Roth Likely Wins for Your Situation'
+    : '🏦 Traditional Likely Wins for Your Situation';
+  document.getElementById('verdict-text').textContent = rothWins
+    ? `At a ${S.tax}% current tax rate, locking in tax-free growth in a Roth gives you ${fmt(final.bal - tradNet)} more after taxes at retirement. Young, lower-bracket earners benefit most from Roth.`
+    : `Your ${S.tax}% tax rate is high enough that the pre-tax deduction saves you meaningful money today. Traditional wins if your retirement tax rate will be lower.`;
+
+  // Cost of waiting
+  const waitRows0  = projectBalance(S.age,    S.ret, S.bal, S.sal, S.sg, S.cr, S.su, S.mr, S.mc, S.ar);
+  const waitRows5  = projectBalance(S.age + 5, S.ret, 0,    S.sal * Math.pow(1+S.sg/100,5), S.sg, S.cr, S.su, S.mr, S.mc, S.ar);
+  const waitRows10 = projectBalance(S.age + 10,S.ret, 0,    S.sal * Math.pow(1+S.sg/100,10), S.sg, S.cr, S.su, S.mr, S.mc, S.ar);
+
+  const bal0  = waitRows0.length  ? waitRows0[waitRows0.length-1].bal  : 0;
+  const bal5  = waitRows5.length  ? waitRows5[waitRows5.length-1].bal  : 0;
+  const bal10 = waitRows10.length ? waitRows10[waitRows10.length-1].bal : 0;
+
+  const waitCards = document.getElementById('wait-cards');
+  waitCards.innerHTML = `
+    <div class="wait-card current-age">
+      <div class="wait-card-age">${S.age}</div>
+      <div class="wait-card-label">Start Now</div>
+      <div class="wait-card-amount v-green">${fmt(bal0)}</div>
+      <div class="wait-card-cost">Baseline</div>
+    </div>
+    <div class="wait-card">
+      <div class="wait-card-age">${S.age+5}</div>
+      <div class="wait-card-label">Wait 5 Years</div>
+      <div class="wait-card-amount v-amber">${fmt(bal5)}</div>
+      <div class="wait-card-cost">Cost: ${fmt(bal0 - bal5)}</div>
+    </div>
+    <div class="wait-card">
+      <div class="wait-card-age">${S.age+10}</div>
+      <div class="wait-card-label">Wait 10 Years</div>
+      <div class="wait-card-amount v-coral">${fmt(bal10)}</div>
+      <div class="wait-card-cost">Cost: ${fmt(bal0 - bal10)}</div>
+    </div>
+  `;
+
+  // Wait chart — align all series to same age labels
+  const allAges = waitRows0.map(r => r.age);
+  const w5map  = Object.fromEntries(waitRows5.map(r  => [r.age, r.bal]));
+  const w10map = Object.fromEntries(waitRows10.map(r => [r.age, r.bal]));
+  waitChart.data.labels = allAges;
+  waitChart.data.datasets[0].data = waitRows0.map(r => r.bal);
+  waitChart.data.datasets[1].data = allAges.map(a => w5map[a]  ?? null);
+  waitChart.data.datasets[2].data = allAges.map(a => w10map[a] ?? null);
+  waitChart.update();
+
+  // Milestones
+  renderMilestones(rows, final.bal);
+}
+
+// ── Table renderer ─────────────────────────────────────────
+function renderTable(rows) {
+  const milestoneAges = new Set([30, 35, 40, 45, 50, 55, 60, S.ret]);
+  const filtered = tableFreq === 1 ? rows : rows.filter((r,i) => (r.age - S.age) % tableFreq === 0 || i === rows.length - 1);
+  const inflFactor = year => Math.pow(1 + S.inf / 100, year - S.age);
+
+  document.getElementById('table-body').innerHTML = filtered.map(r => {
+    const ms = milestoneAges.has(r.age);
+    return `<tr class="${ms ? 'milestone-row' : ''}">
+      <td>Age ${r.age}</td>
+      <td class="v-amber">${fmt(r.yourContrib)}</td>
+      <td class="v-sky">${fmt(r.employerMatch)}</td>
+      <td class="v-green">${fmt(r.yearGrowth)}</td>
+      <td>${fmt(r.bal)}</td>
+      <td style="color:var(--muted)">${fmt(r.bal / inflFactor(r.age))}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Milestones ─────────────────────────────────────────────
+function renderMilestones(rows, finalBal) {
+  const sal25 = S.sal; // approx starting salary
+  const milestones = [
+    { label: '1× Salary Saved', desc: 'Fidelity recommends by age 30', target: sal25,       icon: '🥉', refAge: 30 },
+    { label: '3× Salary Saved', desc: 'On track for comfortable retirement by age 40', target: sal25*3, icon: '🥈', refAge: 40 },
+    { label: '6× Salary Saved', desc: 'Strong position by age 50', target: sal25*6,       icon: '🥇', refAge: 50 },
+    { label: '10× Salary Saved', desc: 'Target by retirement', target: sal25*10,      icon: '🏆', refAge: 65 },
+    { label: '$500K Milestone',  desc: 'Half a million saved', target: 500000,          icon: '💚', refAge: null },
+    { label: '$1M Milestone',    desc: 'The retirement milestone', target: 1000000,    icon: '⭐', refAge: null },
+  ];
+
+  const list = document.getElementById('milestone-list');
+  list.innerHTML = milestones.map(ms => {
+    const reachRow = rows.find(r => r.bal >= ms.target);
+    const reached  = !!reachRow;
+    const ageReach = reached ? reachRow.age : null;
+    const pctDone  = Math.min(100, (finalBal / ms.target) * 100);
+    const eta      = ageReach ? `Reached at age ${ageReach}` : `Not yet reached (need ${fmt(ms.target - finalBal)} more)`;
+
+    return `
+      <div class="milestone${reached ? ' reached' : ''}">
+        <div class="ms-icon">${ms.icon}</div>
+        <div class="ms-info">
+          <div class="ms-title">${ms.label}</div>
+          <div class="ms-detail">${ms.desc}</div>
+          <div class="ms-bar-track">
+            <div class="ms-bar-fill" style="width:${pctDone}%"></div>
+          </div>
+        </div>
+        <div class="ms-status">
+          <div class="${reached ? 'v-green' : 'v-amber'}">${fmt(ms.target)}</div>
+          <div class="ms-eta">${eta}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Animated number ────────────────────────────────────────
+const animTargets = {};
+function animNum(id, target, dur=600) {
+  const el = document.getElementById(id);
+  const start = Date.now();
+  const from  = animTargets[id] || 0;
+  animTargets[id] = target;
+  const tick = () => {
+    const p = Math.min((Date.now()-start)/dur, 1);
+    const e = 1 - Math.pow(1-p, 3);
+    el.textContent = fmt(from + (target-from)*e);
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function resizeCharts() {
+  [growthChart, contribChart, compareChart, waitChart].forEach(c => c.resize());
+}
+
+// ── Init ───────────────────────────────────────────────────
+compute();
+</script>
+</body>
+</html>
