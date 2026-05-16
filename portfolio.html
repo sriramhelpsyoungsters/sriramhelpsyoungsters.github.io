@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Builder · Future You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:       #050d1a;
+      --navy-mid:   #0c1a30;
+      --navy-card:  #0f2040;
+      --navy-deep:  #07111f;
+      --green:      #00e676;
+      --green-dim:  #00b85c;
+      --green-glow: rgba(0,230,118,0.13);
+      --amber:      #ffab00;
+      --amber-glow: rgba(255,171,0,0.12);
+      --coral:      #ff6b6b;
+      --sky:        #40c4ff;
+      --violet:     #b388ff;
+      --peach:      #ffcc80;
+      --white:      #f0f4ff;
+      --muted:      #7a8eaa;
+      --border:     rgba(0,230,118,0.14);
+      --border-dim: rgba(255,255,255,0.06);
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body:    'Nunito', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2.5rem;
+      background: rgba(5,13,26,0.9); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.08em; color: var(--green); text-decoration: none; }
+    .nav-brand span { color: var(--white); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--green); }
+    .nav-back { background: var(--navy-card); border: 1px solid var(--border); color: var(--green) !important; padding: 0.4rem 1rem; border-radius: 4px; }
+
+    /* ── PAGE HERO ── */
+    .page-hero {
+      padding: 6.5rem 2.5rem 2rem;
+      display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 2rem;
+      border-bottom: 1px solid var(--border-dim);
+      background: radial-gradient(ellipse 50% 80% at 85% 10%, rgba(0,230,118,0.05) 0%, transparent 60%);
+    }
+    .page-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); margin-bottom: 0.5rem; }
+    .page-title { font-family: var(--font-display); font-size: clamp(2.8rem,6vw,5rem); line-height: 0.95; letter-spacing: 0.02em; animation: fadeDown 0.6s ease both; }
+    .page-sub { font-size: 0.95rem; color: var(--muted); max-width: 560px; margin-top: 0.75rem; line-height: 1.7; animation: fadeDown 0.6s 0.1s ease both; }
+    .step-pills { display: flex; gap: 0.5rem; animation: fadeDown 0.6s 0.15s ease both; }
+    .step-pill {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      background: var(--navy-card); border: 1px solid var(--border-dim); border-radius: 100px;
+      padding: 0.3rem 0.8rem; color: var(--muted); cursor: pointer; transition: all 0.2s;
+    }
+    .step-pill.active { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+
+    /* ── STEP CONTAINER ── */
+    .steps-wrap { display: flex; flex-direction: column; }
+    .step-view { display: none; }
+    .step-view.active { display: block; }
+
+    /* ════════════════════════════════
+       STEP 1 — RISK QUIZ
+    ════════════════════════════════ */
+    .quiz-wrap {
+      max-width: 720px; margin: 3rem auto; padding: 0 2.5rem;
+    }
+    .quiz-header { text-align: center; margin-bottom: 2.5rem; }
+    .quiz-header h2 { font-family: var(--font-display); font-size: 2.8rem; letter-spacing: 0.02em; margin-bottom: 0.5rem; }
+    .quiz-header p { color: var(--muted); font-size: 0.95rem; }
+
+    .progress-bar-wrap { margin-bottom: 2.5rem; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: var(--muted); margin-bottom: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .progress-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 100px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green-dim), var(--green)); border-radius: 100px; transition: width 0.4s ease; }
+
+    .question-card {
+      background: var(--navy-card); border: 1px solid var(--border-dim);
+      border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem;
+      animation: fadeUp 0.4s ease both;
+    }
+    .question-num { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); margin-bottom: 0.5rem; }
+    .question-text { font-size: 1.05rem; font-weight: 700; margin-bottom: 1.25rem; line-height: 1.5; }
+
+    .options-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+    .option-btn {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.85rem 1.1rem; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.02);
+      color: var(--white); font-family: var(--font-body);
+      font-size: 0.9rem; font-weight: 600; text-align: left;
+      cursor: pointer; transition: all 0.2s; width: 100%;
+    }
+    .option-btn:hover { border-color: var(--border); background: var(--green-glow); }
+    .option-btn.selected { border-color: var(--green); background: var(--green-glow); color: var(--green); }
+    .option-letter {
+      width: 26px; height: 26px; border-radius: 6px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.75rem; font-weight: 900; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-family: var(--font-mono); color: var(--muted); transition: all 0.2s;
+    }
+    .option-btn.selected .option-letter { background: var(--green); color: var(--navy); border-color: var(--green); }
+
+    .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+    .btn-quiz-next {
+      background: var(--green); color: var(--navy);
+      font-family: var(--font-body); font-weight: 900; font-size: 0.9rem;
+      padding: 0.75rem 2rem; border: none; border-radius: 8px;
+      cursor: pointer; letter-spacing: 0.05em; transition: all 0.2s;
+    }
+    .btn-quiz-next:hover { box-shadow: 0 6px 24px rgba(0,230,118,0.3); transform: translateY(-1px); }
+    .btn-quiz-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-quiz-back { background: transparent; color: var(--muted); border: 1px solid var(--border-dim); font-family: var(--font-body); font-size: 0.88rem; font-weight: 700; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+    .btn-quiz-back:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+
+    /* ════════════════════════════════
+       STEP 2 — PORTFOLIO BUILDER
+    ════════════════════════════════ */
+    .builder-layout {
+      display: grid; grid-template-columns: 1fr 400px;
+      gap: 0; min-height: calc(100vh - 140px);
+    }
+
+    /* ── LEFT: sliders ── */
+    .builder-left {
+      padding: 2rem 2.5rem; border-right: 1px solid var(--border-dim);
+      overflow-y: auto;
+    }
+
+    .risk-result-banner {
+      display: flex; align-items: center; gap: 1.25rem;
+      background: var(--navy-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 2rem;
+    }
+    .risk-badge {
+      width: 64px; height: 64px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; flex-shrink: 0;
+    }
+    .risk-result-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.25rem; }
+    .risk-result-name { font-family: var(--font-display); font-size: 1.8rem; letter-spacing: 0.04em; }
+    .risk-result-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-top: 0.2rem; }
+    .risk-retake { background: transparent; border: 1px solid var(--border-dim); color: var(--muted); font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.08em; text-transform: uppercase; margin-left: auto; }
+    .risk-retake:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+
+    .section-head {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--green); padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;
+    }
+    .sum-pct { font-family: var(--font-mono); font-size: 0.82rem; }
+    .sum-pct.ok { color: var(--green); }
+    .sum-pct.bad { color: var(--coral); }
+
+    /* Asset sliders */
+    .asset-block { margin-bottom: 1.5rem; }
+    .asset-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+    .asset-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .asset-label { font-size: 0.88rem; font-weight: 700; flex: 1; }
+    .asset-pct { font-family: var(--font-mono); font-size: 1rem; font-weight: 500; min-width: 40px; text-align: right; }
+    .asset-slider {
+      width: 100%; height: 6px; appearance: none;
+      border-radius: 100px; outline: none; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .asset-slider::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; box-shadow: 0 0 8px rgba(0,0,0,0.4); }
+    .asset-detail { font-size: 0.78rem; color: var(--muted); margin-top: 0.4rem; line-height: 1.5; }
+
+    /* Fund cards */
+    .fund-section { margin-top: 2.5rem; }
+
+    .fund-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .fund-card {
+      background: var(--navy-card); border: 1px solid var(--border-dim);
+      border-radius: 10px; padding: 1rem; cursor: pointer; transition: all 0.2s;
+      position: relative;
+    }
+    .fund-card:hover { border-color: var(--border); }
+    .fund-card.selected { border-color: var(--green); background: var(--green-glow); }
+    .fund-card.selected .fund-check { opacity: 1; }
+    .fund-check {
+      position: absolute; top: 0.6rem; right: 0.6rem;
+      width: 18px; height: 18px; background: var(--green); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; color: var(--navy); font-weight: 900; opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .fund-ticker { font-family: var(--font-mono); font-size: 0.82rem; color: var(--green); font-weight: 500; margin-bottom: 0.2rem; }
+    .fund-name { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.2rem; line-height: 1.3; }
+    .fund-expense { font-size: 0.72rem; color: var(--muted); }
+    .fund-cat-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
+
+    /* ── RIGHT: Donut + Analysis ── */
+    .builder-right {
+      padding: 2rem; background: var(--navy-deep);
+      overflow-y: auto; position: sticky; top: 62px; height: calc(100vh - 62px);
+    }
+
+    .donut-wrap { position: relative; width: 220px; height: 220px; margin: 0 auto 1.5rem; }
+    .donut-wrap canvas { width: 100% !important; height: 100% !important; }
+    .donut-center {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; pointer-events: none;
+    }
+    .donut-center-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+    .donut-center-value { font-family: var(--font-display); font-size: 2.2rem; letter-spacing: 0.02em; color: var(--green); line-height: 1; }
+    .donut-center-sub { font-size: 0.72rem; color: var(--muted); }
+
+    .legend { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .legend-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; }
+    .legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .legend-name { flex: 1; color: var(--muted); }
+    .legend-pct { font-family: var(--font-mono); font-size: 0.82rem; }
+
+    .metric-rows { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.5rem; }
+    .metric-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.6rem 0.85rem; background: var(--navy-card);
+      border: 1px solid var(--border-dim); border-radius: 8px;
+    }
+    .metric-key { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+    .metric-val { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 500; }
+
+    .rebalance-guide {
+      background: var(--navy-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem;
+    }
+    .rebalance-title { font-family: var(--font-display); font-size: 1.3rem; letter-spacing: 0.04em; margin-bottom: 0.75rem; }
+    .rebalance-items { display: flex; flex-direction: column; gap: 0.5rem; }
+    .rebalance-item { font-size: 0.8rem; color: var(--muted); display: flex; gap: 0.5rem; line-height: 1.5; }
+    .rebalance-item::before { content: '→'; color: var(--green); flex-shrink: 0; font-weight: 700; }
+
+    .btn-proceed {
+      width: 100%; background: var(--green); color: var(--navy);
+      font-family: var(--font-body); font-weight: 900; font-size: 0.95rem;
+      padding: 0.9rem; border: none; border-radius: 8px; cursor: pointer;
+      letter-spacing: 0.05em; margin-top: 1.25rem; transition: all 0.2s;
+    }
+    .btn-proceed:hover { box-shadow: 0 8px 28px rgba(0,230,118,0.3); }
+
+    /* ════════════════════════════════
+       STEP 3 — PORTFOLIO PLAN
+    ════════════════════════════════ */
+    .plan-wrap { padding: 2.5rem; max-width: 1100px; margin: 0 auto; }
+
+    .plan-hero-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    .plan-stat {
+      background: var(--navy-card); border: 1px solid var(--border-dim);
+      border-radius: 12px; padding: 1.25rem;
+    }
+    .plan-stat.accent { border-color: var(--border); }
+    .plan-stat-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .plan-stat-val { font-family: var(--font-display); font-size: 2rem; letter-spacing: 0.02em; line-height: 1; }
+
+    .plan-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+
+    .plan-card { background: var(--navy-card); border: 1px solid var(--border-dim); border-radius: 14px; overflow: hidden; }
+    .plan-card-head { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-dim); }
+    .plan-card-title { font-family: var(--font-display); font-size: 1.3rem; letter-spacing: 0.04em; }
+    .plan-card-body { padding: 1.25rem 1.5rem; }
+
+    .allocation-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .alloc-item { display: flex; flex-direction: column; gap: 0.3rem; }
+    .alloc-item-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+    .alloc-item-name { font-weight: 700; }
+    .alloc-item-pct { font-family: var(--font-mono); font-size: 0.85rem; }
+    .alloc-bar-track { height: 6px; background: rgba(255,255,255,0.05); border-radius: 100px; overflow: hidden; }
+    .alloc-bar-fill { height: 100%; border-radius: 100px; transition: width 0.8s cubic-bezier(0.16,1,0.3,1); }
+
+    .glide-path { padding: 0; }
+    .glide-row {
+      display: grid; grid-template-columns: 70px 1fr 1fr;
+      gap: 0.75rem; align-items: center; padding: 0.6rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.82rem;
+    }
+    .glide-row:last-child { border-bottom: none; }
+    .glide-row.header { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: rgba(255,255,255,0.02); }
+    .glide-age { font-family: var(--font-mono); font-weight: 500; }
+    .glide-bar-wrap { display: flex; align-items: center; gap: 0.5rem; }
+    .mini-bar { height: 8px; border-radius: 4px; }
+
+    .rules-list { display: flex; flex-direction: column; gap: 0.85rem; }
+    .rule-item { display: flex; gap: 0.85rem; align-items: flex-start; }
+    .rule-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--green-glow); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+    .rule-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .rule-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+    .fund-picks-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.75rem; }
+    .fund-pick-card {
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim);
+      border-radius: 10px; padding: 1rem;
+    }
+    .fp-cat { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
+    .fp-ticker { font-family: var(--font-mono); font-size: 0.9rem; color: var(--green); margin-bottom: 0.15rem; }
+    .fp-name { font-size: 0.78rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.2rem; }
+    .fp-er { font-size: 0.7rem; color: var(--muted); }
+
+    .btn-restart {
+      display: inline-block; margin-top: 1.5rem;
+      background: transparent; color: var(--muted); border: 1px solid var(--border-dim);
+      font-family: var(--font-body); font-weight: 700; font-size: 0.88rem;
+      padding: 0.7rem 1.75rem; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+    .btn-restart:hover { border-color: var(--green); color: var(--green); }
+
+    /* ── UTILS ── */
+    .v-green  { color: var(--green); }
+    .v-amber  { color: var(--amber); }
+    .v-sky    { color: var(--sky); }
+    .v-coral  { color: var(--coral); }
+    .v-violet { color: var(--violet); }
+    .v-peach  { color: var(--peach); }
+
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp   { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .builder-layout { grid-template-columns: 1fr; }
+      .builder-right { position: static; height: auto; }
+      .plan-cols { grid-template-columns: 1fr; }
+      .plan-hero-grid { grid-template-columns: 1fr 1fr; }
+      .fund-picks-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 0.9rem 1rem; }
+      .nav-links { display: none; }
+      .page-hero { grid-template-columns: 1fr; padding: 5.5rem 1.25rem 1.5rem; }
+      .quiz-wrap { padding: 0 1.25rem; }
+      .builder-left, .builder-right { padding: 1.25rem; }
+      .plan-wrap { padding: 1.25rem; }
+      .plan-hero-grid { grid-template-columns: 1fr; }
+      .fund-grid { grid-template-columns: 1fr; }
+      .fund-picks-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-brand">FUTURE<span>YOU</span></a>
+  <ul class="nav-links">
+    <li><a href="401k.html">401(k)</a></li>
+    <li><a href="portfolio.html" class="active">Portfolio</a></li>
+    <li><a href="projection.html">Projector</a></li>
+    <li><a href="index.html" class="nav-back">← Home</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div>
+    <p class="page-label">Tool 02 · Portfolio Builder</p>
+    <h1 class="page-title">PORTFOLIO BUILDER</h1>
+    <p class="page-sub">Take the risk quiz, build your allocation, pick your funds, and get a personalized rebalancing plan for the accumulation phase.</p>
+  </div>
+  <div class="step-pills">
+    <div class="step-pill active" data-step="0" id="pill-0">① Risk Quiz</div>
+    <div class="step-pill" data-step="1" id="pill-1">② Build Allocation</div>
+    <div class="step-pill" data-step="2" id="pill-2">③ My Plan</div>
+  </div>
+</div>
+
+<!-- STEP VIEWS -->
+<div class="steps-wrap">
+
+  <!-- ══ STEP 0: RISK QUIZ ══ -->
+  <div class="step-view active" id="step-0">
+    <div class="quiz-wrap">
+      <div class="quiz-header">
+        <h2>WHAT'S YOUR <span class="v-green">RISK PROFILE?</span></h2>
+        <p>5 quick questions to find your investor personality and build a starting allocation.</p>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-label">
+          <span id="q-progress-label">Question 1 of 5</span>
+          <span id="q-progress-pct">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div id="quiz-questions"></div>
+      <div class="quiz-nav">
+        <button class="btn-quiz-back" id="q-back" style="visibility:hidden" onclick="qBack()">← Back</button>
+        <button class="btn-quiz-next" id="q-next" disabled onclick="qNext()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 1: BUILDER ══ -->
+  <div class="step-view" id="step-1">
+    <div class="builder-layout">
+
+      <!-- Left: controls -->
+      <div class="builder-left">
+
+        <!-- Risk result banner -->
+        <div class="risk-result-banner" id="risk-banner">
+          <div class="risk-badge" id="risk-badge">🔥</div>
+          <div>
+            <div class="risk-result-label">Your Risk Profile</div>
+            <div class="risk-result-name v-green" id="risk-name">Aggressive Growth</div>
+            <div class="risk-result-desc" id="risk-desc">You can stomach volatility for maximum long-term returns.</div>
+          </div>
+          <button class="risk-retake" onclick="goStep(0)">Retake Quiz</button>
+        </div>
+
+        <!-- Allocation sliders -->
+        <div class="section-head">
+          Asset Allocation
+          <span class="sum-pct ok" id="sum-pct">100%</span>
+        </div>
+
+        <div id="asset-sliders"></div>
+
+        <!-- Fund picker -->
+        <div class="fund-section">
+          <div class="section-head">Pick Your Funds <span style="color:var(--muted);font-size:0.65rem;font-weight:600;text-transform:none;letter-spacing:0">Select one per category</span></div>
+          <div id="fund-picker"></div>
+        </div>
+
+      </div>
+
+      <!-- Right: Donut + stats -->
+      <div class="builder-right">
+        <div style="text-align:center; margin-bottom:0.75rem;">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:0.5rem;">Your Allocation</div>
+        </div>
+
+        <div class="donut-wrap">
+          <canvas id="donut-chart"></canvas>
+          <div class="donut-center">
+            <div class="donut-center-label">Stocks</div>
+            <div class="donut-center-value" id="donut-equity-pct">0%</div>
+            <div class="donut-center-sub">equity exposure</div>
+          </div>
+        </div>
+
+        <div class="legend" id="donut-legend"></div>
+
+        <div class="section-head" style="margin-bottom:1rem;">Portfolio Metrics</div>
+        <div class="metric-rows" id="metric-rows"></div>
+
+        <div class="rebalance-guide">
+          <div class="rebalance-title">REBALANCE RULES</div>
+          <div class="rebalance-items">
+            <div class="rebalance-item">Check allocation <strong>every 12 months</strong> — or after a 5%+ market swing</div>
+            <div class="rebalance-item">If any asset drifts <strong>±5%</strong> from target, rebalance back</div>
+            <div class="rebalance-item">Rebalance by <strong>redirecting new contributions</strong> first (avoids tax events)</div>
+            <div class="rebalance-item">Inside 401(k)/IRA, rebalance freely — <strong>no tax consequence</strong></div>
+            <div class="rebalance-item">Shift <strong>5–10% more to bonds</strong> every decade as you age</div>
+          </div>
+        </div>
+
+        <button class="btn-proceed" onclick="goStep(2)">Generate My Plan →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STEP 2: PLAN ══ -->
+  <div class="step-view" id="step-2">
+    <div class="plan-wrap">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
+        <div>
+          <div class="page-label">Your Personalized Portfolio Plan</div>
+          <h2 class="page-title" style="font-size:2.5rem;" id="plan-title">AGGRESSIVE GROWTH PORTFOLIO</h2>
+        </div>
+        <button class="btn-restart" onclick="goStep(1)">← Edit Allocation</button>
+      </div>
+
+      <div class="plan-hero-grid">
+        <div class="plan-stat accent">
+          <div class="plan-stat-label">Equity Exposure</div>
+          <div class="plan-stat-val v-green" id="ps-equity">0%</div>
+        </div>
+        <div class="plan-stat">
+          <div class="plan-stat-label">Fixed Income</div>
+          <div class="plan-stat-val v-amber" id="ps-bonds">0%</div>
+        </div>
+        <div class="plan-stat">
+          <div class="plan-stat-label">Expected Return</div>
+          <div class="plan-stat-val v-sky" id="ps-return">0%</div>
+        </div>
+        <div class="plan-stat">
+          <div class="plan-stat-label">Expected Volatility</div>
+          <div class="plan-stat-val v-violet" id="ps-vol">—</div>
+        </div>
+        <div class="plan-stat">
+          <div class="plan-stat-label">Avg Expense Ratio</div>
+          <div class="plan-stat-val" id="ps-er">—</div>
+        </div>
+        <div class="plan-stat">
+          <div class="plan-stat-label">Rebalance Frequency</div>
+          <div class="plan-stat-val" style="font-size:1.3rem;">Annual</div>
+        </div>
+      </div>
+
+      <div class="plan-cols">
+
+        <!-- Allocation breakdown -->
+        <div class="plan-card">
+          <div class="plan-card-head"><div class="plan-card-title">ALLOCATION BREAKDOWN</div></div>
+          <div class="plan-card-body">
+            <div class="allocation-list" id="plan-alloc-list"></div>
+          </div>
+        </div>
+
+        <!-- Core rules -->
+        <div class="plan-card">
+          <div class="plan-card-head"><div class="plan-card-title">MANAGING YOUR PORTFOLIO</div></div>
+          <div class="plan-card-body">
+            <div class="rules-list" id="plan-rules"></div>
+          </div>
+        </div>
+
+        <!-- Glide path -->
+        <div class="plan-card">
+          <div class="plan-card-head"><div class="plan-card-title">GLIDE PATH — AS YOU AGE</div></div>
+          <div class="glide-path" id="plan-glide"></div>
+        </div>
+
+        <!-- Fund picks -->
+        <div class="plan-card">
+          <div class="plan-card-head"><div class="plan-card-title">YOUR FUND PICKS</div></div>
+          <div class="plan-card-body">
+            <div class="fund-picks-grid" id="plan-funds"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;">
+        <a href="projection.html" style="display:inline-block;background:var(--green);color:var(--navy);font-family:var(--font-body);font-weight:900;font-size:0.95rem;padding:0.9rem 2.5rem;border-radius:8px;text-decoration:none;letter-spacing:0.05em;transition:all 0.2s;">
+          Next: Run Retirement Projector →
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /steps-wrap -->
+
+<div style="padding:1.25rem 2.5rem;border-top:1px solid var(--border-dim);display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--muted);background:var(--navy-deep);flex-wrap:wrap;gap:0.5rem;">
+  <span>📚 Fund suggestions are illustrative examples — not personalized investment advice. Always read prospectuses.</span>
+  <span>For education only · <a href="index.html" style="color:var(--green);text-decoration:none;">← Future You Home</a></span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const ASSET_COLORS = {
+  'US Stocks':    '#00e676',
+  'Intl Stocks':  '#40c4ff',
+  'Bonds':        '#ffab00',
+  'REITs':        '#b388ff',
+  'Cash/Stable':  '#ffcc80',
+};
+
+const QUESTIONS = [
+  {
+    text: "When do you plan to start withdrawing from this account?",
+    options: [
+      { label: "More than 35 years away", score: 5 },
+      { label: "25–35 years away",         score: 4 },
+      { label: "15–25 years away",         score: 3 },
+      { label: "Less than 15 years away",  score: 2 },
+    ]
+  },
+  {
+    text: "If your portfolio dropped 30% in a single year, what would you do?",
+    options: [
+      { label: "Buy more — this is a discount 🛒",       score: 5 },
+      { label: "Stay the course — I planned for this",  score: 4 },
+      { label: "Get nervous but hold on",               score: 2 },
+      { label: "Move to safer investments",             score: 1 },
+    ]
+  },
+  {
+    text: "Which outcome would bother you more?",
+    options: [
+      { label: "Missing big gains by being too conservative", score: 5 },
+      { label: "Both bother me equally",                      score: 3 },
+      { label: "Losing significant money in a downturn",      score: 1 },
+    ]
+  },
+  {
+    text: "How stable is your income and financial situation?",
+    options: [
+      { label: "Very stable — growing career, emergency fund set", score: 5 },
+      { label: "Fairly stable with minor uncertainty",            score: 3 },
+      { label: "Variable — income can swing significantly",       score: 2 },
+      { label: "Unstable — I rely on this money",                score: 1 },
+    ]
+  },
+  {
+    text: "How experienced are you with investing?",
+    options: [
+      { label: "Very — I understand market cycles and volatility", score: 5 },
+      { label: "Somewhat — I know the basics",                     score: 3 },
+      { label: "Beginner — just starting to learn",               score: 2 },
+      { label: "None — this is all new to me",                    score: 1 },
+    ]
+  }
+];
+
+const RISK_PROFILES = [
+  { name: "Conservative",       emoji: "🛡️",  minScore: 5,  maxScore: 9,
+    desc: "Capital preservation with modest growth. Suitable if you're closer to retirement or have low risk tolerance.",
+    alloc: { 'US Stocks': 25, 'Intl Stocks': 10, 'Bonds': 55, 'REITs': 5, 'Cash/Stable': 5 },
+    expReturn: 4.5, volatility: "Low", color: '#ffcc80' },
+  { name: "Moderate",           emoji: "⚖️",  minScore: 10, maxScore: 14,
+    desc: "Balanced growth with downside protection. A classic 60/40 approach adjusted for your timeline.",
+    alloc: { 'US Stocks': 40, 'Intl Stocks': 15, 'Bonds': 35, 'REITs': 7, 'Cash/Stable': 3 },
+    expReturn: 6.0, volatility: "Medium", color: '#40c4ff' },
+  { name: "Growth",             emoji: "📈",  minScore: 15, maxScore: 19,
+    desc: "Equity-heavy with some fixed income as a buffer. Great for long-horizon investors in their 20s–30s.",
+    alloc: { 'US Stocks': 55, 'Intl Stocks': 20, 'Bonds': 15, 'REITs': 8, 'Cash/Stable': 2 },
+    expReturn: 7.0, volatility: "Medium-High", color: '#00e676' },
+  { name: "Aggressive Growth",  emoji: "🔥",  minScore: 20, maxScore: 25,
+    desc: "Maximum equity exposure. You can stomach volatility because time is on your side.",
+    alloc: { 'US Stocks': 60, 'Intl Stocks': 25, 'Bonds': 5, 'REITs': 8, 'Cash/Stable': 2 },
+    expReturn: 8.0, volatility: "High", color: '#ff6b6b' },
+];
+
+const FUNDS_DB = {
+  'US Stocks': [
+    { ticker: 'VTI',  name: 'Vanguard Total Stock Market ETF',       er: '0.03%' },
+    { ticker: 'FSKAX',name: 'Fidelity Total Market Index Fund',       er: '0.015%' },
+    { ticker: 'SWTSX',name: 'Schwab Total Stock Market Index Fund',   er: '0.03%' },
+    { ticker: 'IVV',  name: 'iShares Core S&P 500 ETF',              er: '0.03%' },
+  ],
+  'Intl Stocks': [
+    { ticker: 'VXUS', name: 'Vanguard Total Intl Stock ETF',          er: '0.07%' },
+    { ticker: 'IXUS', name: 'iShares Core MSCI Total Intl Stock ETF', er: '0.07%' },
+    { ticker: 'FZILX',name: 'Fidelity Zero International Index',      er: '0.00%' },
+    { ticker: 'VEA',  name: 'Vanguard Developed Markets ETF',         er: '0.05%' },
+  ],
+  'Bonds': [
+    { ticker: 'BND',  name: 'Vanguard Total Bond Market ETF',         er: '0.03%' },
+    { ticker: 'AGG',  name: 'iShares Core US Aggregate Bond ETF',     er: '0.03%' },
+    { ticker: 'FXNAX',name: 'Fidelity US Bond Index Fund',            er: '0.025%' },
+    { ticker: 'SCHZ', name: 'Schwab US Aggregate Bond ETF',           er: '0.03%' },
+  ],
+  'REITs': [
+    { ticker: 'VNQ',  name: 'Vanguard Real Estate ETF',               er: '0.12%' },
+    { ticker: 'SCHH', name: 'Schwab US REIT ETF',                     er: '0.07%' },
+    { ticker: 'IYR',  name: 'iShares US Real Estate ETF',             er: '0.40%' },
+  ],
+  'Cash/Stable': [
+    { ticker: 'VMFXX',name: 'Vanguard Federal Money Market Fund',     er: '0.11%' },
+    { ticker: 'SWVXX',name: 'Schwab Value Advantage Money Fund',      er: '0.34%' },
+    { ticker: 'SNSXX',name: 'Schwab Treasury Obligations Money Fund', er: '0.34%' },
+  ],
+};
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let currentStep = 0;
+let qIndex  = 0;
+let qScores = new Array(QUESTIONS.length).fill(null);
+let riskProfile = RISK_PROFILES[2]; // default Growth
+let allocation  = { ...riskProfile.alloc };
+let selectedFunds = {};
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function goStep(n) {
+  document.querySelectorAll('.step-view').forEach((v,i) => v.classList.toggle('active', i === n));
+  document.querySelectorAll('.step-pill').forEach((p,i) => p.classList.toggle('active', i === n));
+  currentStep = n;
+  window.scrollTo(0,0);
+  if (n === 1) renderBuilder();
+  if (n === 2) renderPlan();
+}
+
+document.querySelectorAll('.step-pill').forEach(p => {
+  p.addEventListener('click', () => goStep(parseInt(p.dataset.step)));
+});
+
+// ═══════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════
+function renderQuiz() {
+  const q = QUESTIONS[qIndex];
+  const letters = ['A','B','C','D'];
+  document.getElementById('quiz-questions').innerHTML = `
+    <div class="question-card">
+      <div class="question-num">Question ${qIndex+1} of ${QUESTIONS.length}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="options-grid">
+        ${q.options.map((o,i) => `
+          <button class="option-btn ${qScores[qIndex] === o.score ? 'selected':''}"
+            onclick="selectOption(${o.score}, this)">
+            <span class="option-letter">${letters[i]}</span>
+            ${o.label}
+          </button>`).join('')}
+      </div>
+    </div>`;
+
+  const pct = Math.round(qIndex / QUESTIONS.length * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-progress-label').textContent = `Question ${qIndex+1} of ${QUESTIONS.length}`;
+  document.getElementById('q-progress-pct').textContent   = pct + '%';
+  document.getElementById('q-back').style.visibility = qIndex > 0 ? 'visible' : 'hidden';
+
+  const hasAnswer = qScores[qIndex] !== null;
+  const isLast    = qIndex === QUESTIONS.length - 1;
+  const nextBtn   = document.getElementById('q-next');
+  nextBtn.disabled = !hasAnswer;
+  nextBtn.textContent = isLast ? 'See My Profile →' : 'Next →';
+}
+
+function selectOption(score, el) {
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  qScores[qIndex] = score;
+  document.getElementById('q-next').disabled = false;
+}
+
+function qNext() {
+  if (qIndex < QUESTIONS.length - 1) {
+    qIndex++;
+    renderQuiz();
+  } else {
+    finishQuiz();
+  }
+}
+
+function qBack() {
+  if (qIndex > 0) { qIndex--; renderQuiz(); }
+}
+
+function finishQuiz() {
+  const total = qScores.reduce((a,b) => a + (b||0), 0);
+  riskProfile = RISK_PROFILES.find(p => total >= p.minScore && total <= p.maxScore) || RISK_PROFILES[2];
+  allocation  = { ...riskProfile.alloc };
+  selectedFunds = {};
+  goStep(1);
+}
+
+renderQuiz();
+
+// ═══════════════════════════════════════
+// BUILDER
+// ═══════════════════════════════════════
+const ASSET_SLIDER_COLORS = {
+  'US Stocks':    '#00e676',
+  'Intl Stocks':  '#40c4ff',
+  'Bonds':        '#ffab00',
+  'REITs':        '#b388ff',
+  'Cash/Stable':  '#ffcc80',
+};
+const ASSET_TIPS = {
+  'US Stocks':   'Broad US market exposure. Highest long-term growth but most volatile.',
+  'Intl Stocks': 'Developed & emerging markets outside the US. Diversifies currency & regional risk.',
+  'Bonds':       'Fixed income for stability. Buffers stock volatility; grows slowly.',
+  'REITs':       'Real estate investment trusts. Inflation hedge with dividend income.',
+  'Cash/Stable': 'Money market or stable value fund. Capital preservation; lowest return.',
+};
+
+let donutChart;
+
+function renderBuilder() {
+  // Risk banner
+  document.getElementById('risk-badge').textContent = riskProfile.emoji;
+  document.getElementById('risk-name').textContent  = riskProfile.name;
+  document.getElementById('risk-desc').textContent  = riskProfile.desc;
+
+  // Sliders
+  const container = document.getElementById('asset-sliders');
+  container.innerHTML = Object.keys(allocation).map(asset => `
+    <div class="asset-block">
+      <div class="asset-header">
+        <div class="asset-dot" style="background:${ASSET_SLIDER_COLORS[asset]}"></div>
+        <div class="asset-label">${asset}</div>
+        <div class="asset-pct" id="pct-${slugify(asset)}" style="color:${ASSET_SLIDER_COLORS[asset]}">${allocation[asset]}%</div>
+      </div>
+      <input type="range" class="asset-slider" id="sl-${slugify(asset)}"
+        min="0" max="80" value="${allocation[asset]}" step="1"
+        style="background:linear-gradient(90deg,${ASSET_SLIDER_COLORS[asset]} ${allocation[asset]/80*100}%, rgba(255,255,255,0.1) ${allocation[asset]/80*100}%)"
+        oninput="onSlide('${asset}', this)" />
+      <div class="asset-detail">${ASSET_TIPS[asset]}</div>
+    </div>`).join('');
+
+  // Fund picker
+  renderFundPicker();
+
+  // Donut
+  if (donutChart) donutChart.destroy();
+  donutChart = new Chart(document.getElementById('donut-chart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(allocation),
+      datasets: [{ data: Object.values(allocation), backgroundColor: Object.keys(allocation).map(a => ASSET_SLIDER_COLORS[a]), borderWidth: 3, borderColor: '#07111f', hoverBorderWidth: 0 }]
+    },
+    options: {
+      responsive: false, cutout: '68%', animation: { duration: 400 },
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#0f2040', borderColor: 'rgba(0,230,118,0.3)', borderWidth: 1,
+        callbacks: { label: c => ' ' + c.label + ': ' + c.parsed + '%' }
+      }}
+    }
+  });
+
+  updateRightPanel();
+}
+
+function slugify(s) { return s.replace(/[^a-z0-9]/gi,'').toLowerCase(); }
+
+function onSlide(asset, el) {
+  allocation[asset] = parseInt(el.value);
+  el.style.background = `linear-gradient(90deg,${ASSET_SLIDER_COLORS[asset]} ${parseInt(el.value)/80*100}%, rgba(255,255,255,0.1) ${parseInt(el.value)/80*100}%)`;
+  document.getElementById('pct-'+slugify(asset)).textContent = allocation[asset] + '%';
+  updateRightPanel();
+}
+
+function updateRightPanel() {
+  const total = Object.values(allocation).reduce((a,b)=>a+b,0);
+
+  // Sum pct
+  const sp = document.getElementById('sum-pct');
+  sp.textContent = total + '%';
+  sp.className = 'sum-pct ' + (total === 100 ? 'ok' : 'bad');
+
+  // Donut
+  if (donutChart) {
+    donutChart.data.datasets[0].data = Object.values(allocation);
+    donutChart.update();
+  }
+
+  // Donut center
+  const equity = (allocation['US Stocks'] || 0) + (allocation['Intl Stocks'] || 0);
+  document.getElementById('donut-equity-pct').textContent = equity + '%';
+
+  // Legend
+  document.getElementById('donut-legend').innerHTML = Object.keys(allocation).map(a => `
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:${ASSET_SLIDER_COLORS[a]}"></div>
+      <div class="legend-name">${a}</div>
+      <div class="legend-pct" style="color:${ASSET_SLIDER_COLORS[a]}">${allocation[a]}%</div>
+    </div>`).join('');
+
+  // Metrics
+  const bonds = allocation['Bonds'] || 0;
+  const reits = allocation['REITs'] || 0;
+  const cash  = allocation['Cash/Stable'] || 0;
+  const expRet = (equity * 0.08 + bonds * 0.04 + reits * 0.07 + cash * 0.025) / Math.max(total,1);
+  const vol    = equity > 70 ? 'High' : equity > 50 ? 'Medium-High' : equity > 30 ? 'Medium' : 'Low';
+  const divInc = (reits * 0.035 + bonds * 0.04) / Math.max(total,1);
+
+  document.getElementById('metric-rows').innerHTML = `
+    <div class="metric-row"><span class="metric-key">Total Allocated</span><span class="metric-val ${total===100?'v-green':'v-coral'}">${total}%</span></div>
+    <div class="metric-row"><span class="metric-key">Equity Exposure</span><span class="metric-val v-green">${equity}%</span></div>
+    <div class="metric-row"><span class="metric-key">Fixed Income</span><span class="metric-val v-amber">${bonds}%</span></div>
+    <div class="metric-row"><span class="metric-key">Expected Return*</span><span class="metric-val v-sky">${(expRet*100).toFixed(1)}%</span></div>
+    <div class="metric-row"><span class="metric-key">Volatility Level</span><span class="metric-val">${vol}</span></div>
+    <div class="metric-row"><span class="metric-key">Est. Dividend Income</span><span class="metric-val v-peach">${(divInc*100).toFixed(2)}%</span></div>`;
+}
+
+function renderFundPicker() {
+  const container = document.getElementById('fund-picker');
+  container.innerHTML = Object.keys(FUNDS_DB).map(cat => `
+    <div class="fund-cat-label" style="margin-top:1.25rem; color:${ASSET_SLIDER_COLORS[cat]}">${cat}</div>
+    <div class="fund-grid">
+      ${FUNDS_DB[cat].map(f => `
+        <div class="fund-card ${selectedFunds[cat]===f.ticker?'selected':''}" onclick="selectFund('${cat}','${f.ticker}',this)">
+          <div class="fund-check">✓</div>
+          <div class="fund-ticker">${f.ticker}</div>
+          <div class="fund-name">${f.name}</div>
+          <div class="fund-expense">Expense ratio: ${f.er}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function selectFund(cat, ticker, el) {
+  selectedFunds[cat] = ticker;
+  document.querySelectorAll(`.fund-card`).forEach(c => {
+    if (c.closest('.fund-grid') === el.closest('.fund-grid')) c.classList.remove('selected');
+  });
+  el.classList.add('selected');
+}
+
+// ═══════════════════════════════════════
+// PLAN
+// ═══════════════════════════════════════
+function renderPlan() {
+  const total  = Object.values(allocation).reduce((a,b)=>a+b,0);
+  const equity = (allocation['US Stocks']||0) + (allocation['Intl Stocks']||0);
+  const bonds  = allocation['Bonds']||0;
+  const expRet = (equity*0.08 + bonds*0.04 + (allocation['REITs']||0)*0.07 + (allocation['Cash/Stable']||0)*0.025) / Math.max(total,1);
+  const vol    = equity > 70 ? 'High' : equity > 50 ? 'Medium-High' : equity > 30 ? 'Medium' : 'Low';
+
+  document.getElementById('plan-title').textContent = riskProfile.name.toUpperCase() + ' PORTFOLIO';
+  document.getElementById('ps-equity').textContent  = equity + '%';
+  document.getElementById('ps-bonds').textContent   = bonds + '%';
+  document.getElementById('ps-return').textContent  = (expRet*100).toFixed(1) + '%';
+  document.getElementById('ps-vol').textContent     = vol;
+
+  // Avg ER from selected funds
+  const erVals = Object.entries(selectedFunds).map(([cat,tk]) => {
+    const f = FUNDS_DB[cat]?.find(x=>x.ticker===tk);
+    return f ? parseFloat(f.er) : 0.05;
+  });
+  const avgER = erVals.length ? (erVals.reduce((a,b)=>a+b,0)/erVals.length).toFixed(2)+'%' : '~0.05%';
+  document.getElementById('ps-er').textContent = avgER;
+
+  // Allocation bars
+  document.getElementById('plan-alloc-list').innerHTML = Object.keys(allocation).map(a => `
+    <div class="alloc-item">
+      <div class="alloc-item-top">
+        <div class="alloc-item-name" style="color:${ASSET_SLIDER_COLORS[a]}">${a}</div>
+        <div class="alloc-item-pct">${allocation[a]}%</div>
+      </div>
+      <div class="alloc-bar-track">
+        <div class="alloc-bar-fill" style="width:${allocation[a]}%; background:${ASSET_SLIDER_COLORS[a]}; opacity:0.85"></div>
+      </div>
+    </div>`).join('');
+
+  // Glide path
+  const glideRows = [
+    { age:'20s', stocks: equity,              bonds: bonds,              label:'Current' },
+    { age:'30s', stocks: Math.max(equity-5,0), bonds: Math.min(bonds+5,100), label:'' },
+    { age:'40s', stocks: Math.max(equity-15,0),bonds: Math.min(bonds+15,100),label:'' },
+    { age:'50s', stocks: Math.max(equity-25,0),bonds: Math.min(bonds+25,100),label:'' },
+    { age:'60s', stocks: Math.max(equity-35,0),bonds: Math.min(bonds+35,100),label:'Near Retirement' },
+  ];
+  document.getElementById('plan-glide').innerHTML =
+    `<div class="glide-row header"><div>Decade</div><div>Stocks</div><div>Bonds</div></div>` +
+    glideRows.map(r => `
+      <div class="glide-row">
+        <div class="glide-age">${r.age}</div>
+        <div class="glide-bar-wrap">
+          <div class="mini-bar" style="width:${r.stocks*0.9}px; background:var(--green); opacity:0.8"></div>
+          <span style="font-family:var(--font-mono);font-size:0.78rem;">${r.stocks}%</span>
+        </div>
+        <div class="glide-bar-wrap">
+          <div class="mini-bar" style="width:${r.bonds*0.9}px; background:var(--amber); opacity:0.8"></div>
+          <span style="font-family:var(--font-mono);font-size:0.78rem;">${r.bonds}%</span>
+        </div>
+      </div>`).join('');
+
+  // Rules
+  const rules = [
+    { icon:'📅', title:'Rebalance Annually', desc:'Set a calendar reminder each January. Compare current vs target allocation. Redirect new contributions to underweight assets first.' },
+    { icon:'5️⃣', title:'5% Drift Rule', desc:'If any asset class drifts more than 5% from target, rebalance immediately — don\'t wait for your annual check.' },
+    { icon:'🔄', title:'Step-Down Each Decade', desc:'Reduce equity by roughly 5–10% and increase bonds every decade. Follow your glide path on the left.' },
+    { icon:'💰', title:'Expense Ratio Vigilance', desc:'Even 0.5% extra in fees costs you tens of thousands over 30 years. Stick to index funds under 0.1% where possible.' },
+    { icon:'🏦', title:'Account Location Strategy', desc:'Hold REITs & bonds in tax-advantaged accounts (401k/IRA). Keep US stocks in taxable for lower capital gains rates.' },
+  ];
+  document.getElementById('plan-rules').innerHTML = rules.map(r => `
+    <div class="rule-item">
+      <div class="rule-icon">${r.icon}</div>
+      <div><div class="rule-title">${r.title}</div><div class="rule-desc">${r.desc}</div></div>
+    </div>`).join('');
+
+  // Fund picks
+  document.getElementById('plan-funds').innerHTML = Object.keys(FUNDS_DB).map(cat => {
+    const tk = selectedFunds[cat];
+    const f  = tk ? FUNDS_DB[cat].find(x=>x.ticker===tk) : FUNDS_DB[cat][0];
+    return `
+      <div class="fund-pick-card">
+        <div class="fp-cat" style="color:${ASSET_SLIDER_COLORS[cat]}">${cat}</div>
+        <div class="fp-ticker">${f.ticker}</div>
+        <div class="fp-name">${f.name}</div>
+        <div class="fp-er">ER: ${f.er}</div>
+      </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
