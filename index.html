@@ -835,6 +835,28 @@
 
     .footer-bottom a { color: var(--green); text-decoration: none; }
 
+    /* ── HAMBURGER ── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 0.4rem;
+      background: none;
+      border: none;
+      z-index: 1100;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(24px); }
@@ -846,30 +868,127 @@
       transform: translateY(30px);
       transition: opacity 0.7s ease, transform 0.7s ease;
     }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
 
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
+    /* ════════════════════════════
+       TABLET  ≤ 900px
+    ════════════════════════════ */
+    @media (max-width: 900px) {
+      /* Nav */
+      nav { padding: 1rem 1.5rem; }
+      .nav-tagline { display: none; }
+      .nav-hamburger { display: flex; }
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(5,13,26,0.98);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        z-index: 999;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a {
+        font-size: 1.2rem;
+        letter-spacing: 0.15em;
+      }
+      .nav-cta {
+        padding: 0.75rem 2rem !important;
+        font-size: 1rem !important;
+        border-radius: 8px !important;
+      }
+
+      /* Hero */
+      .hero { padding: 6rem 1.5rem 3rem; }
+      .hero-below { grid-template-columns: 1fr; gap: 1.5rem; }
+      .hero-right { width: 100%; }
+      .compound-card { max-width: 100%; }
+      .hero-headline { font-size: clamp(3.5rem, 10vw, 6rem); }
+      .hero-sub { font-size: 1rem; max-width: 100%; }
+      .hero-buttons { flex-direction: column; align-items: flex-start; }
+      .btn-primary, .btn-ghost { width: 100%; text-align: center; }
+
+      /* Sections */
+      section { padding: 4rem 1.5rem; }
+      .section-title { font-size: clamp(2rem, 8vw, 3.5rem); }
+
+      /* Layouts → single column */
+      .why-grid      { grid-template-columns: 1fr; gap: 2.5rem; }
+      .teaser-grid   { grid-template-columns: 1fr; gap: 2rem; }
+      .tools-grid    { grid-template-columns: 1fr; }
+      .why-stats     { grid-template-columns: 1fr 1fr; }
+
+      /* Phases */
+      .phases { grid-template-columns: 1fr; }
+      .phase  { border-right: none; border-bottom: 1px solid var(--border); }
+      .phase:last-child { border-bottom: none; }
+
+      /* Teaser order */
+      .teaser-content { order: 2; }
+      .mini-calc      { order: 1; }
+
+      /* Trust */
+      .trust-strip { gap: 1rem; padding: 1.25rem 1.5rem; }
+      .trust-item  { font-size: 0.78rem; }
+
+      /* Footer */
+      footer { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1.5rem; }
+      .footer-bottom { flex-direction: column; text-align: center; gap: 0.75rem; }
     }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 900px) {
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { display: none; }
-      .hero { padding: 7rem 1.5rem 3rem; }
-      .hero-below { grid-template-columns: 1fr; }
-      .hero-right { align-items: flex-start; }
-      section { padding: 4rem 1.5rem; }
-      .why-grid, .teaser-grid, .tools-grid { grid-template-columns: 1fr; }
-      .phases { grid-template-columns: 1fr; }
-      .phase { border-right: none; border-bottom: 1px solid var(--border);
-      position: relative; }
-      .phase:last-child { border-bottom: none; }
-      footer { grid-template-columns: 1fr; gap: 2rem; }
-      .why-stats { grid-template-columns: 1fr 1fr; }
-      .teaser-content { order: 2; }
-      .mini-calc { order: 1; }
-      .trust-strip { gap: 1.5rem; }
+    /* ════════════════════════════
+       MOBILE  ≤ 480px
+    ════════════════════════════ */
+    @media (max-width: 480px) {
+      /* Nav */
+      nav { padding: 0.85rem 1rem; }
+      .nav-brand { font-size: 1.2rem; }
+
+      /* Hero */
+      .hero { padding: 5.5rem 1rem 2.5rem; }
+      .hero-tag { font-size: 0.68rem; }
+      .hero-headline { font-size: clamp(3rem, 12vw, 4.5rem); }
+      .compound-card { padding: 1.25rem; }
+      .compound-card-amount { font-size: 2.5rem; }
+      .compound-row { flex-direction: column; align-items: flex-start; gap: 0.25rem; padding: 0.65rem; }
+      .compound-row-label { font-size: 0.75rem; }
+      .compound-row-value { font-size: 1rem; }
+
+      /* Sections */
+      section { padding: 3rem 1rem; }
+      .section-title { font-size: clamp(1.8rem, 9vw, 2.5rem); }
+      .section-sub   { font-size: 0.92rem; }
+
+      /* Why stats → full width */
+      .why-stats { grid-template-columns: 1fr; }
+      .stat-number { font-size: 2rem; }
+
+      /* Tools */
+      .tool-card  { padding: 1.5rem; }
+      .tool-title { font-size: 1.5rem; }
+
+      /* Phases */
+      .phase     { padding: 1.5rem; }
+      .phase-num { font-size: 3.5rem; }
+
+      /* Mini calc */
+      .mini-calc { padding: 1.25rem; }
+      .calc-result-amount { font-size: 2.2rem; }
+
+      /* Trust strip → 2 column grid */
+      .trust-strip {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        padding: 1rem;
+      }
+      .trust-item { font-size: 0.72rem; }
+
+      /* Footer */
+      footer { padding: 1.5rem 1rem; }
+      .footer-bottom { font-size: 0.7rem; }
     }
   </style>
 </head>
@@ -879,11 +998,14 @@
   <nav>
     <a href="index.html" class="nav-brand">FUTURE<span>YOU</span></a>
     <span class="nav-tagline"><span class="early">Start Early</span><span class="dots">...</span><span class="happy">Retire Happy</span></span>
-    <ul class="nav-links">
-      <li><a href="#tools">Tools</a></li>
-      <li><a href="#why-now">Why Now</a></li>
-      <li><a href="#guide">The Plan</a></li>
-      <li><a href="https://sriramhelpsretire.github.io" target="_blank">Retire Wise ↗</a></li>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#tools"   onclick="closeMenu()">Tools</a></li>
+      <li><a href="#why-now" onclick="closeMenu()">Why Now</a></li>
+      <li><a href="#guide"   onclick="closeMenu()">The Plan</a></li>
+      <li><a href="https://sriramhelpsretire.github.io" target="_blank" onclick="closeMenu()">Retire Wise ↗</a></li>
       <li><a href="401k.html" class="nav-cta">Try Calculator</a></li>
     </ul>
   </nav>
@@ -1273,6 +1395,27 @@
       document.getElementById(id).addEventListener('input', calcResult);
     });
     calcResult();
+    // ── Hamburger menu ──
+    const hamburger  = document.getElementById('hamburger');
+    const navLinks   = document.getElementById('nav-links');
+
+    function closeMenu() {
+      hamburger.classList.remove('open');
+      navLinks.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    hamburger.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      hamburger.classList.toggle('open', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    // Close menu on outside click
+    const nav = document.querySelector('nav');
+    document.addEventListener('click', e => {
+      if (!nav.contains(e.target)) closeMenu();
+    });
   </script>
 </body>
 </html>
