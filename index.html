@@ -18,7 +18,7 @@
       --amber: #ffab00;
       --coral: #ff6b6b;
       --white: #f0f4ff;
-      --muted: #7a8eaa;
+      --muted: #DED687;
       --border: rgba(0,230,118,0.15);
       --font-display: 'Bebas Neue', sans-serif;
       --font-body: 'Nunito', sans-serif;
@@ -42,15 +42,15 @@
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
-      z-index: 100;
+      z-index: 1000;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 3rem;
-      background: rgba(5, 13, 26, 0.85);
-      backdrop-filter: blur(12px);
+      background: rgba(5, 13, 26, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      position: relative;
     }
 
     .nav-brand {
@@ -85,7 +85,7 @@
     }
 
     .nav-links a {
-      color: var(--muted);
+      color: #DED687;
       text-decoration: none;
       font-size: 0.85rem;
       font-weight: 600;
@@ -109,9 +109,9 @@
     /* ── HERO ── */
     .hero {
       min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       padding: 8rem 3rem 4rem;
       position: relative;
       overflow: hidden;
@@ -139,6 +139,17 @@
     .hero-left {
       position: relative;
       z-index: 2;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    /* image + card sit side by side below the headline */
+    .hero-below {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 2rem;
+      align-items: flex-start;
+      margin: 1.5rem 0;
     }
 
     .hero-tag {
@@ -182,7 +193,7 @@
 
     .hero-sub {
       font-size: clamp(1rem, 1.8vw, 1.2rem);
-      color: var(--muted);
+      color: #DED687;
       max-width: 480px;
       margin: 1.5rem 0 2.5rem;
       font-weight: 400;
@@ -234,9 +245,6 @@
     .hero-right {
       position: relative;
       z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
       animation: fadeUp 0.9s 0.2s ease both;
     }
 
@@ -486,7 +494,7 @@
     }
 
     .why-text h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
-    .why-text p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+    .why-text p { font-size: 0.85rem; color: #DED687; line-height: 1.6; }
 
     /* ── TOOLS ── */
     .tools-grid {
@@ -552,7 +560,7 @@
 
     .tool-desc {
       font-size: 0.88rem;
-      color: var(--muted);
+      color: #DED687;
       line-height: 1.65;
       margin-bottom: 1.5rem;
     }
@@ -848,8 +856,9 @@
     @media (max-width: 900px) {
       nav { padding: 1rem 1.5rem; }
       .nav-links { display: none; }
-      .hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 3rem; }
-      .hero-right { align-items: flex-start; margin-top: 2rem; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .hero-below { grid-template-columns: 1fr; }
+      .hero-right { align-items: flex-start; }
       section { padding: 4rem 1.5rem; }
       .why-grid, .teaser-grid, .tools-grid { grid-template-columns: 1fr; }
       .phases { grid-template-columns: 1fr; }
@@ -883,48 +892,71 @@
   <section class="hero">
     <div class="grid-bg"></div>
     <div class="hero-left">
-      <div class="hero-tag">For Ages 22–35 · Accumulation Phase</div>
+      <div class="hero-tag">For Ages 25–35 · Accumulation Phase</div>
       <h1 class="hero-headline">
         GROW<br>
         EARLY.<br>
         <span class="accent">RETIRE</span><br>
         BIG.
       </h1>
+
+      <!-- Image + compound card side by side -->
+      <div class="hero-below">
+        <!-- Compounding journey image -->
+        <div style="
+          border-radius: 14px;
+          overflow: hidden;
+          border: 1px solid rgba(0,230,118,0.15);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+          animation: fadeUp 0.7s 0.25s ease both;
+        ">
+          <img
+            src="hero-compounding.png"
+            alt="Start Early, Power of Compounding, Retire Happy"
+            style="width:100%; display:block;"
+          />
+        </div>
+
+        <!-- Compound card -->
+        <div class="hero-right">
+          <div class="compound-card">
+            <div class="compound-card-label">If You Start at 25 vs 35</div>
+            <div class="compound-card-amount" id="hero-counter">$0</div>
+            <div class="compound-card-detail">Projected 401(k) at age 65 · $833/mo ($10K/yr) · 7% avg return</div>
+            <div class="compound-rows">
+              <div class="compound-row">
+                <span class="compound-row-label">💚 Start at 25 (40 yrs)</span>
+                <span class="compound-row-value v-green">$2,187,000</span>
+              </div>
+              <div class="compound-row">
+                <span class="compound-row-label">🟡 Start at 35 (30 yrs)</span>
+                <span class="compound-row-value v-amber">$1,017,000</span>
+              </div>
+              <div class="compound-row">
+                <span class="compound-row-label">⚡ 10-year cost of waiting</span>
+                <span class="compound-row-value v-coral">-$1,170,000</span>
+              </div>
+            </div>
+            <div class="bar-container">
+              <div class="bar-label">Your growth potential</div>
+              <div class="bar-track">
+                <div class="bar-fill" id="hero-bar"></div>
+              </div>
+              <p style="font-size:0.72rem;color:var(--muted);line-height:1.6;margin-top:0.85rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.05);">
+                This illustrates one tax-deferred account (e.g. a 401k). Contributions lower your taxable income today and compound tax-free — a powerful head start. Stocks, bonds, Roth IRAs, and other investments are not shown here.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div><!-- /hero-below -->
+
       <p class="hero-sub">
         The single biggest advantage you have over every older investor is <strong>time</strong>.
         Learn how to save smarter, invest wisely, and watch compounding do the heavy lifting.
       </p>
       <div class="hero-buttons">
-        <a href="401k.html" class="btn-primary">See Your Future →</a>
+        <a href="401k.html" class="btn-primary">Power of Compounding →</a>
         <a href="#tools" class="btn-ghost">Explore Tools</a>
-      </div>
-    </div>
-
-    <div class="hero-right">
-      <div class="compound-card">
-        <div class="compound-card-label">If You Start at 25 vs 35</div>
-        <div class="compound-card-amount" id="hero-counter">$0</div>
-        <div class="compound-card-detail">Projected 401(k) at age 65 · $500/mo · 7% avg return</div>
-        <div class="compound-rows">
-          <div class="compound-row">
-            <span class="compound-row-label">💚 Start at 25 (40 yrs)</span>
-            <span class="compound-row-value v-green">$1,311,000</span>
-          </div>
-          <div class="compound-row">
-            <span class="compound-row-label">🟡 Start at 35 (30 yrs)</span>
-            <span class="compound-row-value v-amber">$567,000</span>
-          </div>
-          <div class="compound-row">
-            <span class="compound-row-label">⚡ 10-year cost of waiting</span>
-            <span class="compound-row-value v-coral">-$744,000</span>
-          </div>
-        </div>
-        <div class="bar-container">
-          <div class="bar-label">Your growth potential</div>
-          <div class="bar-track">
-            <div class="bar-fill" id="hero-bar"></div>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -1177,7 +1209,7 @@
       </ul>
     </div>
     <div class="footer-bottom" style="grid-column:1/-1;">
-      <span>© 2025 Future You · Educational purposes only · Not financial advice</span>
+      <span><u>© 2026 Sriram Gopalaratnam. All Rights reserved</u> 📝</span><span><u>Disclaimer: This tool is for educational purposes only and does not constitute financial or legal advice</u></span><br><br>
       <span>Built with ❤️ to help the next generation retire well</span>
     </div>
   </footer>
@@ -1211,7 +1243,7 @@
     }
 
     setTimeout(() => {
-      animateCounter(document.getElementById('hero-counter'), 1311000);
+      animateCounter(document.getElementById('hero-counter'), 2187000);
       document.getElementById('hero-bar').style.width = '88%';
     }, 400);
 
